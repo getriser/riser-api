@@ -8,6 +8,8 @@ import { User } from './entity/User';
 import GroupsController from './controller/GroupsController';
 import { RouteDefinition } from './types';
 
+// Information on Decorators here.
+// https://nehalist.io/routing-with-typescript-decorators/
 createConnection()
   .then(async (connection) => {
     // create express app
