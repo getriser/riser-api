@@ -12,7 +12,8 @@
       "experimentalDecorators": true,
       "sourceMap": true,
       "types": [
-         "reflect-metadata"
+         "reflect-metadata",
+         "jest"
       ]
    }
 }
