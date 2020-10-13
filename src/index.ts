@@ -4,9 +4,7 @@ import { app } from './app';
 
 // Information on Decorators here.
 // https://nehalist.io/routing-with-typescript-decorators/
-createConnection(
-  process.env.NODE_ENV === 'production' ? 'production' : 'development'
-)
+createConnection('default')
   .then(async (connection) => {
     // start express server
     app.listen(3000, () => {

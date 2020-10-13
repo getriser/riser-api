@@ -1,42 +1,29 @@
-import {
-  Controller,
-  Route,
-  Path,
-  Query,
-  Get,
-  Post,
-  Security,
-  Request,
-} from 'tsoa';
-import * as jwt from 'jsonwebtoken';
-import config from '../config/config';
+import { Controller, Route, Post, Body } from 'tsoa';
+import AuthService from '../services/AuthService';
+import UnauthorizedApiError from '../errors/UnauthorizedApiError';
 
-interface GenerateTokenResponse {
+interface LoginResponse {
   token: string;
 }
 
-interface VerifyTokenResponse {
-  userId: number;
+interface LoginBody {
+  email: string;
+  password: string;
 }
 
 @Route('auth')
 export class AuthController extends Controller {
-  @Post('token')
-  public generateToken(): GenerateTokenResponse {
-    const token = jwt.sign({ userId: 1 }, config.jwtSecret, {
-      expiresIn: '24h',
-    });
+  @Post('login')
+  public async login(@Body() body: LoginBody): Promise<LoginResponse> {
+    const user = await AuthService.loginUser(body.email, body.password);
+    if (!user) {
+      throw new UnauthorizedApiError('Unrecognized email / password.');
+    }
+
+    const token = await AuthService.generateToken(user);
 
     return {
       token,
-    };
-  }
-
-  @Post('verify')
-  @Security('jwt')
-  public verifyToken(@Request() request: any): VerifyTokenResponse {
-    return {
-      ...request.user,
     };
   }
 }
