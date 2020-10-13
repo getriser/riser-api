@@ -8,3 +8,8 @@ export interface RouteDefinition {
   // Method name within our class responsible for this route
   methodName: string;
 }
+
+export interface UserProperties {
+  email: string;
+  password: string;
+}
