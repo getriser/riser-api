@@ -1,6 +1,7 @@
 import * as express from 'express';
 import * as jwt from 'jsonwebtoken';
 import config from './config/config';
+import UnauthorizedApiError from './errors/UnauthorizedApiError';
 
 export function expressAuthentication(
   request: express.Request,
@@ -15,11 +16,11 @@ export function expressAuthentication(
 
     return new Promise((resolve, reject) => {
       if (!token) {
-        reject(new Error('No token provided'));
+        reject(new UnauthorizedApiError('Authentication required.'));
       }
       jwt.verify(token, config.jwtSecret, function (err: any, decoded: any) {
         if (err) {
-          reject(err);
+          reject(new UnauthorizedApiError('Could not verify token.'));
         } else {
           resolve(decoded);
         }
