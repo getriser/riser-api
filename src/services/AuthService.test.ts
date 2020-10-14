@@ -1,6 +1,6 @@
 import AuthService from './AuthService';
 import ConnectionUtil from '../test-utils/ConnectionUtil';
-import { UserProperties } from '../types';
+import { RegisterUserProperties } from '../types';
 import UserService from './UserService';
 
 describe('AuthService', () => {
@@ -17,6 +17,7 @@ describe('AuthService', () => {
       const user = await UserService.registerUser({
         email: 'example@gmail.com',
         password: 'abcd1234',
+        passwordConfirmation: 'abcd1234',
       });
 
       expect(user.id).toBeTruthy();
@@ -27,9 +28,10 @@ describe('AuthService', () => {
 
   describe('loginUser', () => {
     it('returns the user if it is valid', async (done) => {
-      const userProperties: UserProperties = {
+      const userProperties: RegisterUserProperties = {
         email: 'example12@gmail.com',
         password: 'abcd1234',
+        passwordConfirmation: 'abcd1234',
       };
 
       await UserService.registerUser(userProperties);

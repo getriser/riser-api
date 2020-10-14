@@ -1,7 +1,7 @@
 import { User } from '../entity/User';
 import { getRepository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import { JWTToken, UserProperties } from '../types';
+import { JWTToken } from '../types';
 import * as jwt from 'jsonwebtoken';
 import config from '../config/config';
 

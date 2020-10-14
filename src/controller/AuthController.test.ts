@@ -33,6 +33,7 @@ describe('AuthController', () => {
       const user = await UserService.registerUser({
         email: 'm@blah.com',
         password: 'abcd1234',
+        passwordConfirmation: 'abcd1234',
       });
 
       const response = await request.post('/auth/login').send({

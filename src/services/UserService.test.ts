@@ -1,6 +1,5 @@
 import UserService from './UserService';
 import ConnectionUtil from '../test-utils/ConnectionUtil';
-import { UserProperties } from '../types';
 
 describe('UserService', () => {
   beforeAll(async () => {
@@ -16,6 +15,7 @@ describe('UserService', () => {
       const user = await UserService.registerUser({
         email: 'example@gmail.com',
         password: 'abcd1234',
+        passwordConfirmation: 'abcd1234',
       });
 
       expect(user.id).toBeTruthy();
