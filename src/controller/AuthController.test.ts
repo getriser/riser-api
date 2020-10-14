@@ -4,6 +4,7 @@ const supertest = require('supertest');
 import { app } from '../app';
 import { JWTToken } from '../types';
 import ConnectionUtil from '../test-utils/ConnectionUtil';
+import UserService from '../services/UserService';
 const request = supertest(app);
 
 describe('AuthController', () => {
@@ -29,7 +30,7 @@ describe('AuthController', () => {
     });
 
     it('logins the user', async (done) => {
-      const user = await AuthService.registerUser({
+      const user = await UserService.registerUser({
         email: 'm@blah.com',
         password: 'abcd1234',
       });

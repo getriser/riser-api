@@ -30,18 +30,6 @@ export default class AuthService {
     return null;
   }
 
-  static async registerUser(
-    userProperties: UserProperties
-  ): Promise<User | null> {
-    const userRepository = getRepository<User>(User);
-
-    const user = new User();
-    user.email = userProperties.email;
-    user.encryptedPassword = await bcrypt.hash(userProperties.password, 8);
-
-    return userRepository.save(user);
-  }
-
   static async verifyToken(token: string): Promise<JWTToken | null> {
     return new Promise((resolve) => {
       jwt.verify(token, config.jwtSecret, function (

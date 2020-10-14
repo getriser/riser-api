@@ -1,6 +1,7 @@
 import AuthService from './AuthService';
 import ConnectionUtil from '../test-utils/ConnectionUtil';
 import { UserProperties } from '../types';
+import UserService from './UserService';
 
 describe('AuthService', () => {
   beforeAll(async () => {
@@ -13,7 +14,7 @@ describe('AuthService', () => {
 
   describe('registerUser', () => {
     it('registers the user', async (done) => {
-      const user = await AuthService.registerUser({
+      const user = await UserService.registerUser({
         email: 'example@gmail.com',
         password: 'abcd1234',
       });
@@ -31,7 +32,7 @@ describe('AuthService', () => {
         password: 'abcd1234',
       };
 
-      await AuthService.registerUser(userProperties);
+      await UserService.registerUser(userProperties);
 
       let loggedInUser = await AuthService.loginUser(
         userProperties.email,
