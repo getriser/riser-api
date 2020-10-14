@@ -6,6 +6,12 @@ import RegistrationError from '../errors/RegistrationError';
 import { validateEmail } from '../utils/Validations';
 
 export default class UserService {
+  static async getUser(id: number): Promise<User | undefined> {
+    const userRepository = getRepository<User>(User);
+
+    return userRepository.findOne(id);
+  }
+
   static async registerUser(
     userProperties: RegisterUserProperties
   ): Promise<User | null> {

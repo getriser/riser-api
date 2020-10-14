@@ -7,3 +7,12 @@ export interface RegisterUserProperties {
 export interface JWTToken {
   userId: number;
 }
+
+export enum OrganizationUserRole {
+  OWNER = 'OWNER',
+  MEMBER = 'MEMBER',
+}
+
+export interface CreateOrganizationParams {
+  name: string;
+}
