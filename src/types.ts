@@ -16,3 +16,8 @@ export enum OrganizationUserRole {
 export interface CreateOrganizationParams {
   name: string;
 }
+
+export interface CreateOrganizationResponse {
+  id: number;
+  name: string;
+}
