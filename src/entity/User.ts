@@ -1,5 +1,6 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, OneToMany } from 'typeorm';
 import DomainObject from './DomainObject';
+import Announcement from './Announcement';
 
 @Entity()
 export class User extends DomainObject {
@@ -8,4 +9,7 @@ export class User extends DomainObject {
 
   @Column({ length: 100 })
   encryptedPassword: string;
+
+  @OneToMany(() => Announcement, (announcement) => announcement.author)
+  announcements: Announcement[];
 }
