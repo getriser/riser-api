@@ -1,16 +1,11 @@
 import DomainObject from './DomainObject';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, Index, ManyToOne } from 'typeorm';
 import Organization from './Organization';
 import { OrganizationUserRole } from '../types';
+import { User } from './User';
 
 @Entity()
 export default class OrganizationUser extends DomainObject {
-  @Column()
-  userId: number;
-
-  @Column()
-  organizationId: number;
-
   @Column({ type: 'enum', enum: OrganizationUserRole })
   role: OrganizationUserRole;
 
@@ -18,5 +13,8 @@ export default class OrganizationUser extends DomainObject {
     (type) => Organization,
     (organization) => organization.organizationUsers
   )
-  organization: Organization;
+  organization: Promise<Organization>;
+
+  @ManyToOne((type) => User, (user) => user.organizationUsers)
+  user: Promise<User>;
 }

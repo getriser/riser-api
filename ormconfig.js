@@ -20,7 +20,7 @@ module.exports = [
     database: 'riser-api-development',
     synchronize: true,
     dropSchema: true,
-    logging: false,
+    logging: true,
     ...defaultConnectionOptions,
   },
   {

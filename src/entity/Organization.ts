@@ -1,5 +1,5 @@
 import DomainObject from './DomainObject';
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 import OrganizationUser from './OrganizationUser';
 import Announcement from './Announcement';
 
@@ -9,12 +9,12 @@ export default class Organization extends DomainObject {
   name: string;
 
   @OneToMany(() => Announcement, (announcement) => announcement.organization)
-  announcements: Announcement[];
+  announcements: Promise<Announcement[]>;
 
   @OneToMany(
     (type) => OrganizationUser,
     (organizationUser) => organizationUser.organization,
     { cascade: true }
   )
-  organizationUsers: OrganizationUser[];
+  organizationUsers: Promise<OrganizationUser[]>;
 }

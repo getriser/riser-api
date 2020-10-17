@@ -21,3 +21,12 @@ export interface CreateOrganizationResponse {
   id: number;
   name: string;
 }
+
+export interface Member {
+  id: number;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  birthDate: Date;
+  pronouns: string;
+}

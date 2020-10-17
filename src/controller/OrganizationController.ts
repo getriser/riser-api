@@ -1,5 +1,18 @@
-import { Controller, Route, Post, Body, Security, Request } from 'tsoa';
-import { CreateOrganizationParams, CreateOrganizationResponse } from '../types';
+import {
+  Controller,
+  Route,
+  Post,
+  Body,
+  Security,
+  Request,
+  Get,
+  Path,
+} from 'tsoa';
+import {
+  CreateOrganizationParams,
+  CreateOrganizationResponse,
+  Member,
+} from '../types';
 import * as express from 'express';
 import OrganizationService from '../services/OrganizationService';
 
@@ -20,5 +33,14 @@ export class OrganizationController extends Controller {
       id: organization.id,
       name: organization.name,
     };
+  }
+
+  @Get('/:id/members')
+  @Security('jwt')
+  public async getMembers(
+    @Path() id: number,
+    @Request() request: express.Request
+  ): Promise<Member[]> {
+    return OrganizationService.getMembers(request.user.userId, id);
   }
 }

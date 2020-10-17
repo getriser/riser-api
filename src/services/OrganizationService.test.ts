@@ -31,12 +31,38 @@ describe('OrganizationService', () => {
 
       expect(organization.id).toBeTruthy();
       expect(organization.name).toEqual(organizationParams.name);
-      expect(organization.organizationUsers.length).toEqual(1);
+      expect((await organization.organizationUsers).length).toEqual(1);
 
       const organizationUser = organization.organizationUsers[0];
-      expect(organizationUser.userId).toEqual(user.id);
-      expect(organizationUser.organizationId).toEqual(organization.id);
+      expect((await organizationUser.user).id).toEqual(user.id);
+      expect((await organizationUser.organization).id).toEqual(organization.id);
       expect(organizationUser.role).toEqual(OrganizationUserRole.OWNER);
+
+      done();
+    });
+  });
+
+  describe('getMembers', () => {
+    it('gets members to an organization', async (done) => {
+      const user = await UserService.registerUser({
+        email: 'tom@tom.com',
+        password: 'abcd1234',
+        passwordConfirmation: 'abcd1234',
+      });
+
+      const organization = await OrganizationService.createOrganization(
+        user.id,
+        { name: 'Some Organization' }
+      );
+
+      const members = await OrganizationService.getMembers(
+        user.id,
+        organization.id
+      );
+
+      expect(members.length).toEqual(1);
+      expect(members[0].id).toEqual(user.id);
+      expect(members[0].email).toEqual(user.email);
 
       done();
     });

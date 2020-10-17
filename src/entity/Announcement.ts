@@ -1,9 +1,10 @@
 import DomainObject from './DomainObject';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, Index, ManyToOne } from 'typeorm';
 import { User } from './User';
 import Organization from './Organization';
 
 @Entity()
+@Index(['authorId', 'organizationId'])
 export default class Announcement extends DomainObject {
   @Column()
   title: string;
@@ -11,15 +12,18 @@ export default class Announcement extends DomainObject {
   @Column()
   content: string;
 
+  // TODO: Remove these, because the @ManyToOne already does it.
   @Column()
+  @Index()
   authorId: number;
 
   @Column()
+  @Index()
   organizationId: number;
 
   @ManyToOne(() => Organization, (organization) => organization.announcements)
-  organization: Organization;
+  organization: Promise<Organization>;
 
   @ManyToOne(() => User, (user) => user.announcements)
-  author: User;
+  author: Promise<User>;
 }

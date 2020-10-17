@@ -26,6 +26,7 @@
     "@types/helmet": "^0.0.46",
     "@types/jsonwebtoken": "^8.3.9",
     "@types/reflect-metadata": "^0.1.0",
+    "@types/winston": "^2.4.4",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.1",
     "class-validator": "^0.12.2",
@@ -40,7 +41,8 @@
     "swagger-ui-express": "^4.1.4",
     "ts-node-dev": "^1.0.0-pre.44",
     "tsoa": "^3.3.0",
-    "typeorm": "0.2.24"
+    "typeorm": "0.2.24",
+    "winston": "^3.3.3"
   },
   "scripts": {
     "build": "tsoa spec-and-routes",
