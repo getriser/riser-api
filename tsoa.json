@@ -3,6 +3,13 @@
   "noImplicitAdditionalProperties": "throw-on-extras",
   "controllerPathGlobs": ["src/controller/**/*Controller.ts"],
   "spec": {
+    "securityDefinitions": {
+      "jwt": {
+        "type": "apiKey",
+        "name": "x-access-token",
+        "in": "header"
+      }
+    },
     "outputDirectory": "build",
     "specVersion": 3
   },

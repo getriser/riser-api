@@ -1,4 +1,4 @@
-import { Controller, Route, Post, Body } from 'tsoa';
+import { Controller, Route, Post, Body, Tags } from 'tsoa';
 import { RegisterUserProperties } from '../types';
 import UserService from '../services/UserService';
 import AuthService from '../services/AuthService';
@@ -9,6 +9,7 @@ interface RegisterResponse {
   token: string;
 }
 
+@Tags('User Controller')
 @Route('user')
 export class UserController extends Controller {
   @Post('register')

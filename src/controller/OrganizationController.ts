@@ -7,6 +7,7 @@ import {
   Request,
   Get,
   Path,
+  Tags,
 } from 'tsoa';
 import {
   CreateOrganizationParams,
@@ -16,6 +17,7 @@ import {
 import * as express from 'express';
 import OrganizationService from '../services/OrganizationService';
 
+@Tags('Organization Controller')
 @Route('organization')
 export class OrganizationController extends Controller {
   @Post('/create')

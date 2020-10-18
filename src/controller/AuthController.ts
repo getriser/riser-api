@@ -1,4 +1,4 @@
-import { Controller, Route, Post, Body } from 'tsoa';
+import { Controller, Route, Post, Body, Tags } from 'tsoa';
 import AuthService from '../services/AuthService';
 import UnauthorizedApiError from '../errors/UnauthorizedApiError';
 
@@ -11,6 +11,7 @@ interface LoginBody {
   password: string;
 }
 
+@Tags('Auth Controller')
 @Route('auth')
 export class AuthController extends Controller {
   @Post('login')
