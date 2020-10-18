@@ -29,4 +29,5 @@ export interface Member {
   phoneNumber: string;
   birthDate: Date;
   pronouns: string;
+  role: OrganizationUserRole;
 }

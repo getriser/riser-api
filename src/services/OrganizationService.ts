@@ -74,6 +74,7 @@ export default class OrganizationService {
           name: user.name,
           phoneNumber: user.phoneNumber,
           pronouns: user.pronouns,
+          role: orgUser.role,
         };
       })
     );

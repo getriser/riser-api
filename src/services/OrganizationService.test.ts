@@ -2,6 +2,7 @@ import UserService from './UserService';
 import ConnectionUtil from '../test-utils/ConnectionUtil';
 import OrganizationService from './OrganizationService';
 import { CreateOrganizationParams, OrganizationUserRole } from '../types';
+import OrganizationUser from '../entity/OrganizationUser';
 
 describe('OrganizationService', () => {
   beforeAll(async () => {
@@ -29,11 +30,13 @@ describe('OrganizationService', () => {
         organizationParams
       );
 
+      const organizationUsers = await organization.organizationUsers;
+
       expect(organization.id).toBeTruthy();
       expect(organization.name).toEqual(organizationParams.name);
-      expect((await organization.organizationUsers).length).toEqual(1);
+      expect(organizationUsers.length).toEqual(1);
 
-      const organizationUser = organization.organizationUsers[0];
+      const organizationUser: OrganizationUser = organizationUsers[0];
       expect((await organizationUser.user).id).toEqual(user.id);
       expect((await organizationUser.organization).id).toEqual(organization.id);
       expect(organizationUser.role).toEqual(OrganizationUserRole.OWNER);
@@ -63,6 +66,7 @@ describe('OrganizationService', () => {
       expect(members.length).toEqual(1);
       expect(members[0].id).toEqual(user.id);
       expect(members[0].email).toEqual(user.email);
+      expect(members[0].role).toEqual(OrganizationUserRole.OWNER);
 
       done();
     });
