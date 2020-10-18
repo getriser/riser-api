@@ -71,4 +71,42 @@ describe('OrganizationService', () => {
       done();
     });
   });
+
+  describe('inviteMember', () => {
+    it('invites a member to an organization', async (done) => {
+      const user = await UserService.registerUser({
+        email: 'tom@tom2.com',
+        password: 'abcd1234',
+        passwordConfirmation: 'abcd1234',
+      });
+
+      const organization = await OrganizationService.createOrganization(
+        user.id,
+        { name: 'A Different Organization' }
+      );
+
+      let members = await OrganizationService.getMembers(
+        user.id,
+        organization.id
+      );
+
+      expect(members.length).toEqual(1);
+      expect(members[0].id).toEqual(user.id);
+      expect(members[0].email).toEqual(user.email);
+      expect(members[0].role).toEqual(OrganizationUserRole.OWNER);
+
+      await OrganizationService.inviteMember(user.id, organization.id, {
+        email: 'anewmember@example.com',
+        password: 'blahblah',
+        passwordConfirmation: 'blahblah',
+      });
+
+      members = await OrganizationService.getMembers(user.id, organization.id);
+      expect(members.length).toEqual(2);
+      expect(members[1].email).toEqual('anewmember@example.com');
+      expect(members[1].role).toEqual(OrganizationUserRole.MEMBER);
+
+      done();
+    });
+  });
 });

@@ -5,6 +5,7 @@ import {
   CreateOrganizationParams,
   Member,
   OrganizationUserRole,
+  RegisterUserProperties,
 } from '../types';
 import UserService from './UserService';
 import BadRequestApiError from '../errors/BadRequestApiError';
@@ -78,6 +79,61 @@ export default class OrganizationService {
         };
       })
     );
+  }
+
+  public static async inviteMember(
+    loggedInUserId: number,
+    organizationId: number,
+    userToInvite: RegisterUserProperties
+  ): Promise<OrganizationUser> {
+    const organizationRepository = getRepository<Organization>(Organization);
+    const userRepository = getRepository<User>(User);
+    const organizationUserRepository = getRepository<OrganizationUser>(
+      OrganizationUser
+    );
+    const organization = await organizationRepository.findOne(organizationId, {
+      relations: ['organizationUsers'],
+    });
+
+    if (!organization) {
+      throw new ResourceNotFoundError('Organization not found.');
+    }
+
+    const user = await UserService.getUser(loggedInUserId, [
+      'organizationUsers',
+    ]);
+
+    if (!user) {
+      throw new ResourceNotFoundError('User not found.');
+    }
+
+    if (!(await this.isUserBelongToOrganization(user, organization))) {
+      throw new ForbiddenApiError('You do not belong to that organization.');
+    }
+
+    let inviteUser = await userRepository.findOne({
+      where: { email: userToInvite.email },
+    });
+
+    if (!inviteUser) {
+      inviteUser = await UserService.registerUser(userToInvite);
+    } else {
+      const alreadyExisted =
+        (await inviteUser.organizationUsers).filter(
+          async (ou) => (await ou.organization).id === organization.id
+        ).length > 0;
+
+      if (alreadyExisted) {
+        throw new BadRequestApiError('User is already a member.');
+      }
+    }
+
+    const organizationUser = new OrganizationUser();
+    organizationUser.role = OrganizationUserRole.MEMBER;
+    organizationUser.user = Promise.resolve(inviteUser);
+    organizationUser.organization = Promise.resolve(organization);
+
+    return organizationUserRepository.save(organizationUser);
   }
 
   private static async isUserBelongToOrganization(

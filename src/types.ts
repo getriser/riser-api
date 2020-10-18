@@ -31,3 +31,7 @@ export interface Member {
   pronouns: string;
   role: OrganizationUserRole;
 }
+
+export interface SuccessMessage {
+  message: string;
+}
