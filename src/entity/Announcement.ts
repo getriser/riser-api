@@ -4,7 +4,6 @@ import { User } from './User';
 import Organization from './Organization';
 
 @Entity()
-@Index(['authorId', 'organizationId'])
 export default class Announcement extends DomainObject {
   @Column()
   title: string;
@@ -12,18 +11,17 @@ export default class Announcement extends DomainObject {
   @Column()
   content: string;
 
-  // TODO: Remove these, because the @ManyToOne already does it.
   @Column()
-  @Index()
-  authorId: number;
+  draft: boolean;
 
   @Column()
-  @Index()
-  organizationId: number;
+  numberOfComments: number = 0;
 
+  @Index()
   @ManyToOne(() => Organization, (organization) => organization.announcements)
   organization: Promise<Organization>;
 
+  @Index()
   @ManyToOne(() => User, (user) => user.announcements)
   author: Promise<User>;
 }

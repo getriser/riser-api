@@ -32,6 +32,30 @@ export interface Member {
   role: OrganizationUserRole;
 }
 
+export interface Author {
+  name: string;
+}
+
+export interface AnnouncementResponse {
+  id: number;
+  title: string;
+  content: string;
+  isRead: boolean;
+  numberOfComments: number;
+  createdAt: Date;
+  author: Author;
+}
+
 export interface SuccessMessage {
   message: string;
+}
+
+export interface CreateAnnouncementParams {
+  title: string;
+  content: string;
+}
+
+export interface UpdateAnnouncementParams {
+  title: string;
+  content: string;
 }
