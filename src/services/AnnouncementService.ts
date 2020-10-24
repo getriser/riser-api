@@ -11,6 +11,28 @@ import AbstractService from './AbstractService';
 import BadRequestApiError from '../errors/BadRequestApiError';
 
 export default class AnnouncementService extends AbstractService {
+  public static async getAnnouncement(
+    loggedInUserId: number,
+    announcementId: number
+  ): Promise<Announcement> {
+    const user = await this.findUserOrThrow(loggedInUserId);
+    const announcementsRepository = getRepository<Announcement>(Announcement);
+    const announcement = await announcementsRepository.findOne(announcementId, {
+      relations: ['organization'],
+    });
+
+    if (!announcement) {
+      throw new ResourceNotFoundError('Announcement not found.');
+    }
+
+    await this.throwIfNotBelongsToOrganization(
+      user,
+      await announcement.organization
+    );
+
+    return announcement;
+  }
+
   public static async createAnnouncement(
     loggedInUserId: number,
     organizationId: number,
@@ -94,7 +116,7 @@ export default class AnnouncementService extends AbstractService {
     const announcementsRepository = getRepository<Announcement>(Announcement);
     const announcements = await announcementsRepository.find({
       relations: ['author'],
-      where: { organizationId: organizationId, draft: false },
+      where: { organization: organizationId, draft: false },
       order: { createdAt: 'DESC' },
       skip: offset,
       take: limit,
@@ -106,6 +128,7 @@ export default class AnnouncementService extends AbstractService {
 
         const response: AnnouncementResponse = {
           author: {
+            id: author.id,
             name: author.name,
           },
           content: announcement.content,

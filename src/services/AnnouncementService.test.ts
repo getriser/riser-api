@@ -1,7 +1,12 @@
 import ConnectionUtil from '../test-utils/ConnectionUtil';
-import UserService from './UserService';
-import OrganizationService from './OrganizationService';
 import AnnouncementService from './AnnouncementService';
+import {
+  createAnnouncement,
+  createOrganization,
+  createUser,
+  DEFAULT_PASSWORD,
+} from '../test-utils/Factories';
+import OrganizationService from './OrganizationService';
 
 describe('AnnouncementService', () => {
   beforeAll(async () => {
@@ -14,18 +19,8 @@ describe('AnnouncementService', () => {
 
   describe('createAnnouncement', () => {
     it('creates an announcement', async (done) => {
-      const user = await UserService.registerUser({
-        email: 'mike@mike.com',
-        password: 'abcd1234',
-        passwordConfirmation: 'abcd1234',
-      });
-
-      const organization = await OrganizationService.createOrganization(
-        user.id,
-        {
-          name: 'Organization Name',
-        }
-      );
+      const user = await createUser();
+      const organization = await createOrganization(user);
 
       const announcementParams = {
         content: 'Come to Room 304 at 10pm',
@@ -44,6 +39,156 @@ describe('AnnouncementService', () => {
       expect(announcement.content).toEqual(announcementParams.content);
       expect((await announcement.author).id).toEqual(user.id);
       expect((await announcement.organization).id).toEqual(organization.id);
+
+      done();
+    });
+  });
+
+  describe('updateAnnouncment', () => {
+    it('updates an announcement', async (done) => {
+      const user = await createUser();
+      const organization = await createOrganization(user);
+      const announcement = await createAnnouncement(user, organization);
+
+      const updateAnnouncementParams = {
+        content: 'New Content',
+        title: 'New Title',
+      };
+
+      const updatedAnnouncement = await AnnouncementService.updateAnnouncement(
+        user.id,
+        announcement.id,
+        updateAnnouncementParams
+      );
+
+      expect(updatedAnnouncement.id).toEqual(announcement.id);
+      expect(updatedAnnouncement.title).toEqual(updatedAnnouncement.title);
+      expect(updatedAnnouncement.content).toEqual(updatedAnnouncement.content);
+      expect(updatedAnnouncement.draft).toEqual(announcement.draft);
+
+      done();
+    });
+  });
+
+  describe('publishAnnouncement', () => {
+    it('sets the draft to false', async (done) => {
+      const user = await createUser();
+      const organization = await createOrganization(user);
+      const announcement = await createAnnouncement(user, organization);
+
+      expect(announcement.draft).toEqual(true);
+
+      const publishedAnnouncement = await AnnouncementService.publishAnnouncement(
+        user.id,
+        announcement.id
+      );
+      expect(publishedAnnouncement.draft).toEqual(false);
+
+      done();
+    });
+  });
+
+  describe('getPublicAnnouncementsForOrganization', () => {
+    it('returns all published announcements for an organization', async (done) => {
+      const owner = await createUser();
+      const member = await createUser();
+      const organization = await createOrganization(owner);
+
+      await OrganizationService.inviteMember(owner.id, organization.id, {
+        email: member.email,
+        password: DEFAULT_PASSWORD,
+        passwordConfirmation: DEFAULT_PASSWORD,
+      });
+
+      const ownerAnnouncement = await createAnnouncement(owner, organization);
+      const memberAnnouncement = await createAnnouncement(member, organization);
+
+      expect(ownerAnnouncement.draft).toEqual(true);
+      expect(memberAnnouncement.draft).toEqual(true);
+
+      console.log('ownerId', owner.id);
+      console.log('memberId', member.id);
+
+      expect(
+        await AnnouncementService.getPublicAnnouncementsForOrganization(
+          owner.id,
+          organization.id
+        )
+      ).toHaveLength(0);
+
+      await AnnouncementService.publishAnnouncement(
+        owner.id,
+        ownerAnnouncement.id
+      );
+
+      await AnnouncementService.publishAnnouncement(
+        member.id,
+        memberAnnouncement.id
+      );
+
+      const announcements = await AnnouncementService.getPublicAnnouncementsForOrganization(
+        owner.id,
+        organization.id
+      );
+
+      expect(announcements).toHaveLength(2);
+
+      const ownerAnnouncementResponse = announcements.filter(
+        (response) => response.id === ownerAnnouncement.id
+      )[0];
+
+      const memberAnnouncementResponse = announcements.filter(
+        (response) => response.id === memberAnnouncement.id
+      )[0];
+
+      expect(ownerAnnouncementResponse.title).toEqual(
+        ownerAnnouncementResponse.title
+      );
+      expect(ownerAnnouncementResponse.content).toEqual(
+        ownerAnnouncementResponse.content
+      );
+      expect(ownerAnnouncementResponse.createdAt).toEqual(
+        ownerAnnouncementResponse.createdAt
+      );
+      expect(ownerAnnouncementResponse.author.name).toEqual(owner.name);
+      expect(ownerAnnouncementResponse.numberOfComments).toEqual(
+        ownerAnnouncementResponse.numberOfComments
+      );
+
+      expect(memberAnnouncementResponse.title).toEqual(
+        memberAnnouncementResponse.title
+      );
+      expect(memberAnnouncementResponse.content).toEqual(
+        memberAnnouncementResponse.content
+      );
+      expect(memberAnnouncementResponse.createdAt).toEqual(
+        memberAnnouncementResponse.createdAt
+      );
+      expect(memberAnnouncementResponse.author.name).toEqual(member.name);
+      expect(memberAnnouncementResponse.numberOfComments).toEqual(
+        memberAnnouncementResponse.numberOfComments
+      );
+
+      done();
+    });
+  });
+
+  describe('getAnnouncement', () => {
+    it('fetches an announcement', async (done) => {
+      const user = await createUser();
+      const organization = await createOrganization(user);
+      const announcement = await createAnnouncement(user, organization);
+
+      const fetchedAnnouncement = await AnnouncementService.getAnnouncement(
+        user.id,
+        announcement.id
+      );
+
+      expect(fetchedAnnouncement.id).toEqual(announcement.id);
+      expect(fetchedAnnouncement.title).toEqual(announcement.title);
+      expect(fetchedAnnouncement.content).toEqual(announcement.content);
+      expect(fetchedAnnouncement.draft).toEqual(announcement.draft);
+      expect(fetchedAnnouncement.createdAt).toEqual(announcement.createdAt);
 
       done();
     });
