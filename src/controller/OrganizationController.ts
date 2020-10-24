@@ -8,8 +8,10 @@ import {
   Get,
   Path,
   Tags,
+  Query,
 } from 'tsoa';
 import {
+  AnnouncementResponse,
   CreateOrganizationParams,
   CreateOrganizationResponse,
   Member,
@@ -19,13 +21,14 @@ import {
 import * as express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import OrganizationService from '../services/OrganizationService';
+import AnnouncementService from '../services/AnnouncementService';
 
 interface InviteMemberBody {
   email: string;
 }
 
 @Tags('Organization Controller')
-@Route('organization')
+@Route('organizations')
 export class OrganizationController extends Controller {
   @Post('/create')
   @Security('jwt')
@@ -76,5 +79,21 @@ export class OrganizationController extends Controller {
     return {
       message: 'User successfully invited.',
     };
+  }
+
+  @Get('/:id/announcements')
+  @Security('jwt')
+  public async getAnnouncements(
+    @Path() id: number,
+    @Request() request: express.Request,
+    @Query() offset?: number,
+    @Query() limit?: number
+  ): Promise<AnnouncementResponse[]> {
+    return AnnouncementService.getPublicAnnouncementsForOrganization(
+      request.user.userId,
+      id,
+      offset,
+      limit
+    );
   }
 }

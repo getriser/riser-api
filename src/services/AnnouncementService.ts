@@ -14,11 +14,11 @@ export default class AnnouncementService extends AbstractService {
   public static async getAnnouncement(
     loggedInUserId: number,
     announcementId: number
-  ): Promise<Announcement> {
+  ): Promise<AnnouncementResponse> {
     const user = await this.findUserOrThrow(loggedInUserId);
     const announcementsRepository = getRepository<Announcement>(Announcement);
     const announcement = await announcementsRepository.findOne(announcementId, {
-      relations: ['organization'],
+      relations: ['organization', 'author'],
     });
 
     if (!announcement) {
@@ -30,14 +30,14 @@ export default class AnnouncementService extends AbstractService {
       await announcement.organization
     );
 
-    return announcement;
+    return this.toAnnouncementResponse(announcement);
   }
 
   public static async createAnnouncement(
     loggedInUserId: number,
     organizationId: number,
     createAnnouncementParams: CreateAnnouncementParams
-  ): Promise<Announcement> {
+  ): Promise<AnnouncementResponse> {
     const organization = await this.findOrganizationOrThrow(organizationId);
     const user = await this.findUserOrThrow(loggedInUserId);
     await this.throwIfNotBelongsToOrganization(user, organization);
@@ -50,14 +50,16 @@ export default class AnnouncementService extends AbstractService {
     announcement.content = createAnnouncementParams.content;
     announcement.draft = true;
 
-    return announcementsRepository.save(announcement);
+    return this.toAnnouncementResponse(
+      await announcementsRepository.save(announcement)
+    );
   }
 
   public static async updateAnnouncement(
     loggedInUserId: number,
     announcementId: number,
     updateAnnouncementParams: UpdateAnnouncementParams
-  ): Promise<Announcement> {
+  ): Promise<AnnouncementResponse> {
     const announcementRespository = getRepository<Announcement>(Announcement);
     const user = await this.findUserOrThrow(loggedInUserId);
     const announcement = await announcementRespository.findOne(announcementId);
@@ -74,13 +76,15 @@ export default class AnnouncementService extends AbstractService {
     announcement.title = updateAnnouncementParams.title;
     announcement.content = updateAnnouncementParams.content;
 
-    return announcementRespository.save(announcement);
+    return this.toAnnouncementResponse(
+      await announcementRespository.save(announcement)
+    );
   }
 
   public static async publishAnnouncement(
     loggedInUserId: number,
     announcementId: number
-  ): Promise<Announcement> {
+  ): Promise<AnnouncementResponse> {
     const announcementRespository = getRepository<Announcement>(Announcement);
     const user = await this.findUserOrThrow(loggedInUserId);
     const announcement = await announcementRespository.findOne(announcementId);
@@ -100,7 +104,9 @@ export default class AnnouncementService extends AbstractService {
 
     announcement.draft = false;
 
-    return announcementRespository.save(announcement);
+    return this.toAnnouncementResponse(
+      await announcementRespository.save(announcement)
+    );
   }
 
   public static async getPublicAnnouncementsForOrganization(
@@ -122,27 +128,26 @@ export default class AnnouncementService extends AbstractService {
       take: limit,
     });
 
-    const announcementResponses: AnnouncementResponse[] = await Promise.all(
-      announcements.map(async (announcement) => {
-        const author = await announcement.author;
-
-        const response: AnnouncementResponse = {
-          author: {
-            id: author.id,
-            name: author.name,
-          },
-          content: announcement.content,
-          createdAt: announcement.createdAt,
-          id: announcement.id,
-          isRead: false,
-          numberOfComments: announcement.numberOfComments,
-          title: announcement.title,
-        };
-
-        return response;
-      })
+    return await Promise.all(
+      announcements.map(async (announcement) =>
+        this.toAnnouncementResponse(announcement)
+      )
     );
+  }
 
-    return announcementResponses;
+  private static async toAnnouncementResponse(
+    announcement: Announcement
+  ): Promise<AnnouncementResponse> {
+    const author = await announcement.author;
+
+    return {
+      author: { id: author.id, name: author.name },
+      content: announcement.content,
+      createdAt: announcement.createdAt,
+      id: announcement.id,
+      isRead: false,
+      numberOfComments: announcement.numberOfComments,
+      title: announcement.title,
+    };
   }
 }

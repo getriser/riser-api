@@ -56,6 +56,10 @@ export interface CreateAnnouncementParams {
   content: string;
 }
 
+export interface CreateAnnouncementBodyParams extends CreateAnnouncementParams {
+  organizationId: number;
+}
+
 export interface UpdateAnnouncementParams {
   title: string;
   content: string;

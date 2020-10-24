@@ -10,7 +10,7 @@ interface RegisterResponse {
 }
 
 @Tags('User Controller')
-@Route('user')
+@Route('users')
 export class UserController extends Controller {
   @Post('register')
   public async register(
