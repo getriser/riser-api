@@ -3,6 +3,11 @@ import ConnectionUtil from '../test-utils/ConnectionUtil';
 import OrganizationService from './OrganizationService';
 import { CreateOrganizationParams, OrganizationUserRole } from '../types';
 import OrganizationUser from '../entity/OrganizationUser';
+import {
+  createOrganization,
+  createUser,
+  DEFAULT_PASSWORD,
+} from '../test-utils/Factories';
 
 describe('OrganizationService', () => {
   beforeAll(async () => {
@@ -11,6 +16,55 @@ describe('OrganizationService', () => {
 
   afterAll(async () => {
     await ConnectionUtil.disconnect();
+  });
+
+  describe('getOrganizations', () => {
+    it('returns all of the organizations that the user belongs to', async (done) => {
+      const user = await createUser();
+      const organization = await createOrganization(user);
+
+      const invitedOrganizationOwner = await createUser();
+      const invitedOrganization = await createOrganization(
+        invitedOrganizationOwner
+      );
+
+      await OrganizationService.inviteMember(
+        invitedOrganizationOwner.id,
+        invitedOrganization.id,
+        {
+          email: user.email,
+          password: DEFAULT_PASSWORD,
+          passwordConfirmation: DEFAULT_PASSWORD,
+        }
+      );
+
+      const organizations = await OrganizationService.getOrganizations(user.id);
+      expect(organizations).toHaveLength(2);
+
+      const ownerOrganizationResponse = organizations.filter(
+        (org) => org.id === organization.id
+      )[0];
+
+      expect(ownerOrganizationResponse.id).toEqual(organization.id);
+      expect(ownerOrganizationResponse.name).toEqual(organization.name);
+      expect(ownerOrganizationResponse.role).toEqual(
+        OrganizationUserRole.OWNER
+      );
+
+      const invitedOrganizationResponse = organizations.filter(
+        (org) => org.id === invitedOrganization.id
+      )[0];
+
+      expect(invitedOrganizationResponse.id).toEqual(invitedOrganization.id);
+      expect(invitedOrganizationResponse.name).toEqual(
+        invitedOrganization.name
+      );
+      expect(invitedOrganizationResponse.role).toEqual(
+        OrganizationUserRole.MEMBER
+      );
+
+      done();
+    });
   });
 
   describe('createOrganization', () => {

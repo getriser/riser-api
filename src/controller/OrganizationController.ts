@@ -15,6 +15,7 @@ import {
   CreateOrganizationParams,
   CreateOrganizationResponse,
   Member,
+  OrganizationResponse,
   RegisterUserProperties,
   SuccessMessage,
 } from '../types';
@@ -30,6 +31,14 @@ interface InviteMemberBody {
 @Tags('Organization Controller')
 @Route('organizations')
 export class OrganizationController extends Controller {
+  @Get('/')
+  @Security('jwt')
+  public async getOrganizations(
+    @Request() request: express.Request
+  ): Promise<OrganizationResponse[]> {
+    return OrganizationService.getOrganizations(request.user.userId);
+  }
+
   @Post('/create')
   @Security('jwt')
   public async createOrganization(

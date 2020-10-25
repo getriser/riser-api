@@ -148,6 +148,7 @@ export default class AnnouncementService extends AbstractService {
       isRead: false,
       numberOfComments: announcement.numberOfComments,
       title: announcement.title,
+      draft: announcement.draft,
     };
   }
 }

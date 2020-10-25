@@ -25,7 +25,7 @@ describe('UserController', () => {
       };
 
       const response = await request
-        .post('/user/register')
+        .post('/users/register')
         .send(registerParams);
 
       expect(response.status).toEqual(200);

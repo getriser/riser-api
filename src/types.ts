@@ -40,6 +40,7 @@ export interface Author {
 export interface AnnouncementResponse {
   id: number;
   title: string;
+  draft: boolean;
   content: string;
   isRead: boolean;
   numberOfComments: number;
@@ -63,4 +64,10 @@ export interface CreateAnnouncementBodyParams extends CreateAnnouncementParams {
 export interface UpdateAnnouncementParams {
   title: string;
   content: string;
+}
+
+export interface OrganizationResponse {
+  id: number;
+  name: string;
+  role: OrganizationUserRole;
 }

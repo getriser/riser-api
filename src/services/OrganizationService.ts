@@ -4,6 +4,7 @@ import OrganizationUser from '../entity/OrganizationUser';
 import {
   CreateOrganizationParams,
   Member,
+  OrganizationResponse,
   OrganizationUserRole,
   RegisterUserProperties,
 } from '../types';
@@ -12,8 +13,31 @@ import BadRequestApiError from '../errors/BadRequestApiError';
 import ResourceNotFoundError from '../errors/ResourceNotFoundError';
 import { User } from '../entity/User';
 import ForbiddenApiError from '../errors/ForbiddenApiError';
+import AbstractService from './AbstractService';
 
-export default class OrganizationService {
+export default class OrganizationService extends AbstractService {
+  static async getOrganizations(
+    loggedInUserId: number
+  ): Promise<OrganizationResponse[]> {
+    const user = await this.findUserOrThrow(loggedInUserId, [
+      'organizationUsers',
+      'organizationUsers.organization',
+    ]);
+
+    const organizationUsers = await user.organizationUsers;
+    return Promise.all(
+      organizationUsers.map(async (organizationUser) => {
+        const organization = await organizationUser.organization;
+
+        return {
+          id: organization.id,
+          name: organization.name,
+          role: organizationUser.role,
+        };
+      })
+    );
+  }
+
   static async createOrganization(
     ownerId: number,
     organizationParams: CreateOrganizationParams
@@ -118,12 +142,11 @@ export default class OrganizationService {
     if (!inviteUser) {
       inviteUser = await UserService.registerUser(userToInvite);
     } else {
-      const alreadyExisted =
-        (await inviteUser.organizationUsers).filter(
-          async (ou) => (await ou.organization).id === organization.id
-        ).length > 0;
+      const existingOrganizationUser = await organizationUserRepository.findOne(
+        { where: { user: inviteUser, organization: organization } }
+      );
 
-      if (alreadyExisted) {
+      if (existingOrganizationUser) {
         throw new BadRequestApiError('User is already a member.');
       }
     }
