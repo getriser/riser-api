@@ -96,7 +96,7 @@ export default class OrganizationService extends AbstractService {
           birthDate: user.birthDate,
           email: user.email,
           id: user.id,
-          name: user.name,
+          name: user.fullName,
           phoneNumber: user.phoneNumber,
           pronouns: user.pronouns,
           role: orgUser.role,

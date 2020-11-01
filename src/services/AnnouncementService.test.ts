@@ -7,6 +7,7 @@ import {
   DEFAULT_PASSWORD,
 } from '../test-utils/Factories';
 import OrganizationService from './OrganizationService';
+import * as faker from "faker";
 
 describe('AnnouncementService', () => {
   beforeAll(async () => {
@@ -96,6 +97,8 @@ describe('AnnouncementService', () => {
 
       await OrganizationService.inviteMember(owner.id, organization.id, {
         email: member.email,
+        firstName: faker.name.firstName(),
+        lastName: faker.name.lastName(),
         password: DEFAULT_PASSWORD,
         passwordConfirmation: DEFAULT_PASSWORD,
       });
@@ -147,7 +150,7 @@ describe('AnnouncementService', () => {
       expect(ownerAnnouncementResponse.createdAt).toEqual(
         ownerAnnouncementResponse.createdAt
       );
-      expect(ownerAnnouncementResponse.author.name).toEqual(owner.name);
+      expect(ownerAnnouncementResponse.author.name).toEqual(owner.fullName);
       expect(ownerAnnouncementResponse.numberOfComments).toEqual(
         ownerAnnouncementResponse.numberOfComments
       );
@@ -161,7 +164,7 @@ describe('AnnouncementService', () => {
       expect(memberAnnouncementResponse.createdAt).toEqual(
         memberAnnouncementResponse.createdAt
       );
-      expect(memberAnnouncementResponse.author.name).toEqual(member.name);
+      expect(memberAnnouncementResponse.author.name).toEqual(member.fullName);
       expect(memberAnnouncementResponse.numberOfComments).toEqual(
         memberAnnouncementResponse.numberOfComments
       );

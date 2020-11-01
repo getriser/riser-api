@@ -8,6 +8,7 @@ import {
   createUser,
   DEFAULT_PASSWORD,
 } from '../test-utils/Factories';
+import * as faker from "faker";
 
 describe('OrganizationService', () => {
   beforeAll(async () => {
@@ -33,6 +34,8 @@ describe('OrganizationService', () => {
         invitedOrganization.id,
         {
           email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
           password: DEFAULT_PASSWORD,
           passwordConfirmation: DEFAULT_PASSWORD,
         }
@@ -69,11 +72,7 @@ describe('OrganizationService', () => {
 
   describe('createOrganization', () => {
     it('creates an organization and makes the user the owner', async (done) => {
-      const user = await UserService.registerUser({
-        email: 'example987@gmail.com',
-        password: 'abcd1234',
-        passwordConfirmation: 'abcd1234',
-      });
+      const user = await createUser();
 
       const organizationParams: CreateOrganizationParams = {
         name: 'My Awesome Group',
@@ -101,16 +100,9 @@ describe('OrganizationService', () => {
 
   describe('getMembers', () => {
     it('gets members to an organization', async (done) => {
-      const user = await UserService.registerUser({
-        email: 'tom@tom.com',
-        password: 'abcd1234',
-        passwordConfirmation: 'abcd1234',
-      });
+      const user = await createUser();
 
-      const organization = await OrganizationService.createOrganization(
-        user.id,
-        { name: 'Some Organization' }
-      );
+      const organization = await createOrganization(user);
 
       const members = await OrganizationService.getMembers(
         user.id,
@@ -128,16 +120,9 @@ describe('OrganizationService', () => {
 
   describe('inviteMember', () => {
     it('invites a member to an organization', async (done) => {
-      const user = await UserService.registerUser({
-        email: 'tom@tom2.com',
-        password: 'abcd1234',
-        passwordConfirmation: 'abcd1234',
-      });
+      const user = await createUser();
 
-      const organization = await OrganizationService.createOrganization(
-        user.id,
-        { name: 'A Different Organization' }
-      );
+      const organization = await createOrganization(user);
 
       let members = await OrganizationService.getMembers(
         user.id,
@@ -151,6 +136,8 @@ describe('OrganizationService', () => {
 
       await OrganizationService.inviteMember(user.id, organization.id, {
         email: 'anewmember@example.com',
+        firstName: faker.name.firstName(),
+        lastName: faker.name.lastName(),
         password: 'blahblah',
         passwordConfirmation: 'blahblah',
       });

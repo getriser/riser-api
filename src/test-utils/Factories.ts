@@ -11,6 +11,8 @@ export const DEFAULT_PASSWORD = 'abcd1234';
 export const createUser = async (): Promise<User> => {
   return UserService.registerUser({
     email: faker.internet.email(),
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName(),
     password: DEFAULT_PASSWORD,
     passwordConfirmation: DEFAULT_PASSWORD,
   });

@@ -46,6 +46,8 @@ export default class UserService {
 
     const user = new User();
     user.email = userProperties.email;
+    user.firstName = userProperties.firstName;
+    user.lastName = userProperties.lastName;
     user.encryptedPassword = await bcrypt.hash(userProperties.password, 8);
 
     return userRepository.save(user);

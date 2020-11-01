@@ -26,6 +26,8 @@ import AnnouncementService from '../services/AnnouncementService';
 
 interface InviteMemberBody {
   email: string;
+  firstName: string;
+  lastName: string;
 }
 
 @Tags('Organization Controller')
@@ -75,6 +77,8 @@ export class OrganizationController extends Controller {
     const defaultPassword = uuidv4();
     const registerUser: RegisterUserProperties = {
       email: body.email,
+      firstName: body.firstName,
+      lastName: body.lastName,
       password: defaultPassword,
       passwordConfirmation: defaultPassword,
     };

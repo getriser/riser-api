@@ -12,8 +12,11 @@ export class User extends DomainObject {
   @Column({ length: 100 })
   encryptedPassword: string;
 
-  @Column({ nullable: true })
-  name: string;
+  @Column({ nullable: false })
+  firstName: string;
+
+  @Column({ nullable: false })
+  lastName: string;
 
   @Column({ type: 'date', nullable: true })
   birthDate: Date;
@@ -33,4 +36,8 @@ export class User extends DomainObject {
     { cascade: true }
   )
   organizationUsers: Promise<OrganizationUser[]>;
+
+  get fullName(): string {
+    return `${this.firstName} ${this.lastName}`;
+  }
 }

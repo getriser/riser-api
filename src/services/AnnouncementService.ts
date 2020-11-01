@@ -141,7 +141,7 @@ export default class AnnouncementService extends AbstractService {
     const author = await announcement.author;
 
     return {
-      author: { id: author.id, name: author.name },
+      author: { id: author.id, name: author.fullName },
       content: announcement.content,
       createdAt: announcement.createdAt,
       id: announcement.id,

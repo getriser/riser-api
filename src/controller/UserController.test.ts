@@ -5,6 +5,7 @@ import { app } from '../app';
 import { RegisterUserProperties } from '../types';
 import ConnectionUtil from '../test-utils/ConnectionUtil';
 import UserService from '../services/UserService';
+import * as faker from 'faker';
 const request = supertest(app);
 
 describe('UserController', () => {
@@ -20,6 +21,8 @@ describe('UserController', () => {
     it('registers a user', async (done) => {
       const registerParams: RegisterUserProperties = {
         email: 'blah@blah.com',
+        firstName: faker.name.firstName(),
+        lastName: faker.name.lastName(),
         password: 'abcd1234',
         passwordConfirmation: 'abcd1234',
       };
