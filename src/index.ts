@@ -1,11 +1,12 @@
 import 'reflect-metadata';
 import { createConnection } from 'typeorm';
 import { app } from './app';
+import DevelopmentService from './services/DevelopmentService';
 
-// Information on Decorators here.
-// https://nehalist.io/routing-with-typescript-decorators/
 createConnection('default')
   .then(async (connection) => {
+    await DevelopmentService.initializeDevelopmentData();
+
     // start express server
     app.listen(3000, () => {
       console.log('Express server has started on port 3000.');
