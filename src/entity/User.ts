@@ -2,6 +2,7 @@ import { Entity, Column, OneToMany, Index } from 'typeorm';
 import DomainObject from './DomainObject';
 import Announcement from './Announcement';
 import OrganizationUser from './OrganizationUser';
+import config from '../config/config';
 
 @Entity()
 export class User extends DomainObject {
@@ -27,6 +28,9 @@ export class User extends DomainObject {
   @Column({ nullable: true })
   phoneNumber: string;
 
+  @Column({ nullable: true })
+  imagePath: string;
+
   @OneToMany(() => Announcement, (announcement) => announcement.author)
   announcements: Promise<Announcement[]>;
 
@@ -39,5 +43,11 @@ export class User extends DomainObject {
 
   get fullName(): string {
     return `${this.firstName} ${this.lastName}`;
+  }
+
+  get imageUrl(): string | undefined {
+    if (this.imagePath) {
+      return `${config.assetPath}${this.imagePath}`;
+    }
   }
 }

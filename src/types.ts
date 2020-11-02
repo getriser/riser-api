@@ -31,6 +31,7 @@ export interface Member {
   phoneNumber: string;
   birthDate: Date;
   pronouns: string;
+  imageUrl: string;
   role: OrganizationUserRole;
 }
 

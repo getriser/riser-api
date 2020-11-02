@@ -99,6 +99,7 @@ export default class OrganizationService extends AbstractService {
           name: user.fullName,
           phoneNumber: user.phoneNumber,
           pronouns: user.pronouns,
+          imageUrl: user.imageUrl,
           role: orgUser.role,
         };
       })

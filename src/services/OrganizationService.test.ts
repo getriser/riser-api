@@ -8,7 +8,7 @@ import {
   createUser,
   DEFAULT_PASSWORD,
 } from '../test-utils/Factories';
-import * as faker from "faker";
+import * as faker from 'faker';
 
 describe('OrganizationService', () => {
   beforeAll(async () => {
@@ -112,6 +112,7 @@ describe('OrganizationService', () => {
       expect(members.length).toEqual(1);
       expect(members[0].id).toEqual(user.id);
       expect(members[0].email).toEqual(user.email);
+      expect(members[0].imageUrl).toEqual(user.imageUrl);
       expect(members[0].role).toEqual(OrganizationUserRole.OWNER);
 
       done();
