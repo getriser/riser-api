@@ -3,6 +3,7 @@ import DomainObject from './DomainObject';
 import Announcement from './Announcement';
 import OrganizationUser from './OrganizationUser';
 import config from '../config/config';
+import Comment from './Comment';
 
 @Entity()
 export class User extends DomainObject {
@@ -40,6 +41,9 @@ export class User extends DomainObject {
     { cascade: true }
   )
   organizationUsers: Promise<OrganizationUser[]>;
+
+  @OneToMany(() => Comment, (comment) => comment.author)
+  comments: Promise<Comment[]>;
 
   get fullName(): string {
     return `${this.firstName} ${this.lastName}`;

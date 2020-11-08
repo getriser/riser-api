@@ -7,7 +7,7 @@ import {
   DEFAULT_PASSWORD,
 } from '../test-utils/Factories';
 import OrganizationService from './OrganizationService';
-import * as faker from "faker";
+import * as faker from 'faker';
 
 describe('AnnouncementService', () => {
   beforeAll(async () => {
@@ -189,6 +189,44 @@ describe('AnnouncementService', () => {
       expect(fetchedAnnouncement.content).toEqual(announcement.content);
       expect(fetchedAnnouncement.draft).toEqual(announcement.draft);
       expect(fetchedAnnouncement.createdAt).toEqual(announcement.createdAt);
+
+      done();
+    });
+  });
+
+  describe('postCommentToAnnouncement', () => {
+    it('adds a comment to an announcement', async (done) => {
+      const user = await createUser();
+      const organization = await createOrganization(user);
+      const announcement = await createAnnouncement(user, organization);
+
+      expect(announcement.numberOfComments).toEqual(0);
+
+      const content = faker.lorem.sentence();
+
+      const comment = await AnnouncementService.postCommentToAnnouncement(
+        user.id,
+        announcement.id,
+        content
+      );
+
+      const comments = await AnnouncementService.getCommentsForAnnouncement(
+        user.id,
+        announcement.id
+      );
+      expect(comments.length).toEqual(1);
+
+      expect(comments[0].id).toEqual(comment.id);
+      expect(comments[0].content).toEqual(content);
+      expect(comments[0].createdAt).toEqual(comment.createdAt);
+      expect(comments[0].author.id).toEqual(user.id);
+      expect(comments[0].author.name).toEqual(user.fullName);
+
+      const refresedAnnouncement = await AnnouncementService.getAnnouncement(
+        user.id,
+        announcement.id
+      );
+      expect(refresedAnnouncement.numberOfComments).toEqual(1);
 
       done();
     });

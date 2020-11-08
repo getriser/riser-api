@@ -13,7 +13,9 @@ import {
 import * as express from 'express';
 import {
   AnnouncementResponse,
+  CommentResponse,
   CreateAnnouncementBodyParams,
+  PostCommentAnnouncementParams,
   UpdateAnnouncementParams,
 } from '../types';
 import AnnouncementService from '../services/AnnouncementService';
@@ -64,5 +66,31 @@ export class AnnouncementController extends Controller {
     @Request() request: express.Request
   ): Promise<AnnouncementResponse> {
     return AnnouncementService.publishAnnouncement(request.user.userId, id);
+  }
+
+  @Get(':id/comments')
+  @Security('jwt')
+  public async getComments(
+    @Path() id: number,
+    @Request() request: express.Request
+  ): Promise<CommentResponse[]> {
+    return AnnouncementService.getCommentsForAnnouncement(
+      request.user.userId,
+      id
+    );
+  }
+
+  @Post(':id/comments')
+  @Security('jwt')
+  public async postComment(
+    @Path() id: number,
+    @Body() body: PostCommentAnnouncementParams,
+    @Request() request: express.Request
+  ): Promise<CommentResponse> {
+    return AnnouncementService.postCommentToAnnouncement(
+      request.user.userId,
+      id,
+      body.content
+    );
   }
 }

@@ -69,8 +69,23 @@ export interface UpdateAnnouncementParams {
   content: string;
 }
 
+export interface PostCommentAnnouncementParams {
+  content: string;
+}
+
 export interface OrganizationResponse {
   id: number;
   name: string;
   role: OrganizationUserRole;
+}
+
+export enum CommentResourceType {
+  ANNOUNCEMENT,
+}
+
+export interface CommentResponse {
+  id: number;
+  content: string;
+  createdAt: Date;
+  author: Author;
 }

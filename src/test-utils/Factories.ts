@@ -29,7 +29,7 @@ export const createAnnouncement = async (
   organization: Organization
 ) => {
   const params: CreateAnnouncementParams = {
-    content: faker.lorem.paragraph(),
+    content: faker.lorem.paragraphs(4),
     title: faker.lorem.sentence(),
   };
 

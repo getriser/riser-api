@@ -1,5 +1,7 @@
 import {
   AnnouncementResponse,
+  CommentResourceType,
+  CommentResponse,
   CreateAnnouncementParams,
   UpdateAnnouncementParams,
 } from '../types';
@@ -9,6 +11,7 @@ import ForbiddenApiError from '../errors/ForbiddenApiError';
 import Announcement from '../entity/Announcement';
 import AbstractService from './AbstractService';
 import BadRequestApiError from '../errors/BadRequestApiError';
+import Comment from '../entity/Comment';
 
 export default class AnnouncementService extends AbstractService {
   public static async getAnnouncement(
@@ -133,6 +136,76 @@ export default class AnnouncementService extends AbstractService {
         this.toAnnouncementResponse(announcement)
       )
     );
+  }
+
+  public static async getCommentsForAnnouncement(
+    loggedInUserId: number,
+    announcementId: number
+  ): Promise<CommentResponse[]> {
+    const user = await this.findUserOrThrow(loggedInUserId);
+
+    const announcementsRepository = getRepository<Announcement>(Announcement);
+    const commentsRepository = getRepository<Comment>(Comment);
+
+    const announcement = await announcementsRepository.findOne(announcementId);
+
+    await this.throwIfNotBelongsToOrganization(
+      user,
+      await announcement.organization
+    );
+
+    const comments = await commentsRepository.find({
+      where: {
+        resourceType: CommentResourceType.ANNOUNCEMENT,
+        resourceId: announcementId,
+      },
+      order: {
+        createdAt: 'ASC',
+      },
+      relations: ['author'],
+    });
+
+    return comments.map((comment) => this.toCommentResponse(comment));
+  }
+
+  public static async postCommentToAnnouncement(
+    loggedInUserId: number,
+    announcementId: number,
+    content: string
+  ): Promise<CommentResponse> {
+    const user = await this.findUserOrThrow(loggedInUserId);
+
+    const announcementsRepository = getRepository<Announcement>(Announcement);
+    const commentsRepository = getRepository<Comment>(Comment);
+
+    const announcement = await announcementsRepository.findOne(announcementId);
+
+    await this.throwIfNotBelongsToOrganization(
+      user,
+      await announcement.organization
+    );
+
+    const comment = new Comment();
+    comment.resourceType = CommentResourceType.ANNOUNCEMENT;
+    comment.resourceId = announcement.id;
+    comment.content = content;
+    comment.author = user;
+
+    const savedComment = await commentsRepository.save(comment);
+
+    announcement.numberOfComments += 1;
+    await announcementsRepository.save(announcement);
+
+    return this.toCommentResponse(savedComment);
+  }
+
+  private static toCommentResponse(comment: Comment): CommentResponse {
+    return {
+      id: comment.id,
+      author: { id: comment.author.id, name: comment.author.fullName },
+      content: comment.content,
+      createdAt: comment.createdAt,
+    };
   }
 
   private static async toAnnouncementResponse(
