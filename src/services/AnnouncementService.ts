@@ -131,11 +131,18 @@ export default class AnnouncementService extends AbstractService {
       take: limit,
     });
 
-    return await Promise.all(
-      announcements.map(async (announcement) =>
-        this.toAnnouncementResponse(announcement)
-      )
-    );
+    const myDraftAnnouncements = await announcementsRepository.find({
+      relations: ['author'],
+      where: { organization: organizationId, draft: true, author: user },
+      order: { createdAt: 'DESC' },
+    });
+
+    const allAnnouncements = [
+      ...myDraftAnnouncements.map((a) => this.toAnnouncementResponse(a)),
+      ...announcements.map((a) => this.toAnnouncementResponse(a)),
+    ];
+
+    return await Promise.all(allAnnouncements);
   }
 
   public static async getCommentsForAnnouncement(

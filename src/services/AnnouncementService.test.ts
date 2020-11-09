@@ -109,12 +109,14 @@ describe('AnnouncementService', () => {
       expect(ownerAnnouncement.draft).toEqual(true);
       expect(memberAnnouncement.draft).toEqual(true);
 
-      expect(
-        await AnnouncementService.getPublicAnnouncementsForOrganization(
-          owner.id,
-          organization.id
-        )
-      ).toHaveLength(0);
+      const myDraftAnnouncements = await AnnouncementService.getPublicAnnouncementsForOrganization(
+        owner.id,
+        organization.id
+      );
+
+      expect(myDraftAnnouncements).toHaveLength(1);
+      expect(myDraftAnnouncements[0].id).toEqual(ownerAnnouncement.id);
+      expect(myDraftAnnouncements[0].draft).toEqual(ownerAnnouncement.draft);
 
       await AnnouncementService.publishAnnouncement(
         owner.id,
