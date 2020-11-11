@@ -19,7 +19,7 @@ interface CraeteFolderBody extends CreateFolderParams {
 
 @Tags('File Controller')
 @Route('files')
-export class OrganizationController extends Controller {
+export class FileController extends Controller {
   @Post('/folders')
   @Security('jwt')
   public async createFolder(
