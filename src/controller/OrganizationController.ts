@@ -14,6 +14,7 @@ import {
   AnnouncementResponse,
   CreateOrganizationParams,
   CreateOrganizationResponse,
+  FileResponse,
   Member,
   OrganizationResponse,
   RegisterUserProperties,
@@ -23,6 +24,7 @@ import * as express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import OrganizationService from '../services/OrganizationService';
 import AnnouncementService from '../services/AnnouncementService';
+import FileService from '../services/FileService';
 
 interface InviteMemberBody {
   email: string;
@@ -108,5 +110,19 @@ export class OrganizationController extends Controller {
       offset,
       limit
     );
+  }
+
+  @Get('/:id/files')
+  @Security('jwt')
+  public async getFiles(
+    @Path() id: number,
+    @Request() request: express.Request
+  ): Promise<FileResponse[]> {
+    const rootFolder = await FileService.getRootFolderForOrganization(
+      request.user.userId,
+      id
+    );
+
+    return FileService.getFilesFromFolder(request.user.userId, rootFolder.id);
   }
 }

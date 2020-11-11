@@ -97,6 +97,7 @@ export enum FileFolderType {
 
 export interface FileResponse {
   id: number;
+  name: string;
   type: FileFolderType;
   filePath: string;
 }

@@ -7,7 +7,7 @@ import BadRequestApiError from '../errors/BadRequestApiError';
 import Organization from '../entity/Organization';
 import { User } from '../entity/User';
 
-export default class FilesService extends AbstractService {
+export default class FileService extends AbstractService {
   static async getFilesFromFolder(
     loggedInUserId: number,
     folderId: number
@@ -84,7 +84,7 @@ export default class FilesService extends AbstractService {
 
     const filesRepository = getRepository<FileFolder>(FileFolder);
     const folder = await filesRepository.findOne({
-      where: { organization: Promise.resolve(organization), parent: null },
+      where: { organization: organization, parent: null },
     });
 
     return this.toFileResponse(folder);
@@ -96,7 +96,7 @@ export default class FilesService extends AbstractService {
   ): Promise<FileFolder> {
     const filesRepository = getRepository<FileFolder>(FileFolder);
     const existingParent = await filesRepository.findOne({
-      where: { organization: Promise.resolve(organization), parent: null },
+      where: { organization: organization, parent: null },
     });
 
     if (existingParent) {
@@ -118,6 +118,7 @@ export default class FilesService extends AbstractService {
   private static toFileResponse(file: FileFolder): FileResponse {
     return {
       id: file.id,
+      name: file.name,
       type: file.type,
       filePath: file.filePath,
     };

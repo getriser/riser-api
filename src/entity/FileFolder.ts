@@ -27,7 +27,6 @@ export default class FileFolder extends DomainObject {
   @ManyToOne(() => User, (user) => user.announcements)
   owner: Promise<User>;
 
-  @Index()
   @OneToMany(() => FileFolder, (fileFolder) => fileFolder.parent)
   children: Promise<FileFolder[]>;
 }

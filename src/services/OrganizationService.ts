@@ -14,6 +14,7 @@ import ResourceNotFoundError from '../errors/ResourceNotFoundError';
 import { User } from '../entity/User';
 import ForbiddenApiError from '../errors/ForbiddenApiError';
 import AbstractService from './AbstractService';
+import FileService from './FileService';
 
 export default class OrganizationService extends AbstractService {
   static async getOrganizations(
@@ -58,7 +59,11 @@ export default class OrganizationService extends AbstractService {
 
     organization.organizationUsers = Promise.resolve([organizationUser]);
 
-    return organizationRepository.save(organization);
+    const savedOrganization = await organizationRepository.save(organization);
+
+    await FileService.createRootFolderForOrganization(user, savedOrganization);
+
+    return savedOrganization;
   }
 
   static async getMembers(

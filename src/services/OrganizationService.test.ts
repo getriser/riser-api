@@ -1,7 +1,10 @@
-import UserService from './UserService';
 import ConnectionUtil from '../test-utils/ConnectionUtil';
 import OrganizationService from './OrganizationService';
-import { CreateOrganizationParams, OrganizationUserRole } from '../types';
+import {
+  CreateOrganizationParams,
+  FileFolderType,
+  OrganizationUserRole,
+} from '../types';
 import OrganizationUser from '../entity/OrganizationUser';
 import {
   createOrganization,
@@ -9,6 +12,7 @@ import {
   DEFAULT_PASSWORD,
 } from '../test-utils/Factories';
 import * as faker from 'faker';
+import FileService from './FileService';
 
 describe('OrganizationService', () => {
   beforeAll(async () => {
@@ -93,6 +97,30 @@ describe('OrganizationService', () => {
       expect((await organizationUser.user).id).toEqual(user.id);
       expect((await organizationUser.organization).id).toEqual(organization.id);
       expect(organizationUser.role).toEqual(OrganizationUserRole.OWNER);
+
+      done();
+    });
+
+    it('creates a root folder for the organization', async (done) => {
+      const user = await createUser();
+
+      const organizationParams: CreateOrganizationParams = {
+        name: 'My Awesome Group',
+      };
+
+      const organization = await OrganizationService.createOrganization(
+        user.id,
+        organizationParams
+      );
+
+      const file = await FileService.getRootFolderForOrganization(
+        user.id,
+        organization.id
+      );
+
+      expect(file).toBeTruthy();
+      expect(file.id).toBeTruthy();
+      expect(file.type).toEqual(FileFolderType.FOLDER);
 
       done();
     });
