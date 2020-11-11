@@ -13,7 +13,7 @@ import { CreateFolderParams, FileResponse } from '../types';
 import * as express from 'express';
 import FileService from '../services/FileService';
 
-interface CraeteFolderBody extends CreateFolderParams {
+interface CreateFolderBody extends CreateFolderParams {
   parentId: number;
 }
 
@@ -23,7 +23,7 @@ export class FileController extends Controller {
   @Post('/folders')
   @Security('jwt')
   public async createFolder(
-    @Body() body: CraeteFolderBody,
+    @Body() body: CreateFolderBody,
     @Request() request: express.Request
   ): Promise<FileResponse> {
     return FileService.createFolder(request.user.userId, body.parentId, body);
