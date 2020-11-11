@@ -32,6 +32,11 @@ interface InviteMemberBody {
   lastName: string;
 }
 
+interface GetFilesResponse {
+  parentFolderId: number;
+  files: FileResponse[];
+}
+
 @Tags('Organization Controller')
 @Route('organizations')
 export class OrganizationController extends Controller {
@@ -117,12 +122,20 @@ export class OrganizationController extends Controller {
   public async getFiles(
     @Path() id: number,
     @Request() request: express.Request
-  ): Promise<FileResponse[]> {
+  ): Promise<GetFilesResponse> {
     const rootFolder = await FileService.getRootFolderForOrganization(
       request.user.userId,
       id
     );
 
-    return FileService.getFilesFromFolder(request.user.userId, rootFolder.id);
+    const files = await FileService.getFilesFromFolder(
+      request.user.userId,
+      rootFolder.id
+    );
+
+    return {
+      parentFolderId: rootFolder.id,
+      files,
+    };
   }
 }
