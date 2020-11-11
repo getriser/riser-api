@@ -89,3 +89,18 @@ export interface CommentResponse {
   createdAt: Date;
   author: Author;
 }
+
+export enum FileFolderType {
+  FOLDER = 'FOLDER',
+  FILE = 'FILE',
+}
+
+export interface FileResponse {
+  id: number;
+  type: FileFolderType;
+  filePath: string;
+}
+
+export interface CreateFolderParams {
+  name: string;
+}
