@@ -15,6 +15,9 @@ export default class FileFolder extends DomainObject {
   @Column({ nullable: true })
   filePath: string;
 
+  @Column({ nullable: true })
+  fileSize: number;
+
   @Index()
   @ManyToOne(() => FileFolder, (fileFolder) => fileFolder.children)
   parent: Promise<FileFolder>;

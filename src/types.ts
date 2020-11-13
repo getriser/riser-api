@@ -99,7 +99,7 @@ export interface FileResponse {
   id: number;
   name: string;
   type: FileFolderType;
-  filePath: string;
+  fileUrl?: string;
 }
 
 export interface CreateFolderParams {

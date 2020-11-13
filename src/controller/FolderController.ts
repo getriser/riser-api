@@ -12,15 +12,16 @@ import {
 import { CreateFolderParams, FileResponse } from '../types';
 import * as express from 'express';
 import FileService from '../services/FileService';
+import * as multer from 'multer';
 
 interface CreateFolderBody extends CreateFolderParams {
   parentId: number;
 }
 
-@Tags('File Controller')
-@Route('files')
-export class FileController extends Controller {
-  @Post('/folders')
+@Tags('Folder Controller')
+@Route('folders')
+export class FolderController extends Controller {
+  @Post('/')
   @Security('jwt')
   public async createFolder(
     @Body() body: CreateFolderBody,
@@ -29,12 +30,35 @@ export class FileController extends Controller {
     return FileService.createFolder(request.user.userId, body.parentId, body);
   }
 
-  @Get('/folders/:id')
+  @Get('/:id/files')
   @Security('jwt')
   public async getFilesFromFolder(
     @Path() id: number,
     @Request() request: express.Request
   ): Promise<FileResponse[]> {
     return FileService.getFilesFromFolder(request.user.userId, id);
+  }
+
+  @Post('/:id/files')
+  @Security('jwt')
+  public async uploadFile(
+    @Path() id: number,
+    @Request() request: express.Request
+  ): Promise<FileResponse> {
+    await this.handleFile(request);
+
+    return FileService.uploadFile(request.user.userId, id, request.file);
+  }
+
+  private handleFile(request: express.Request): Promise<any> {
+    const multerSingle = multer().single('file');
+    return new Promise((resolve, reject) => {
+      multerSingle(request, undefined, async (error) => {
+        if (error) {
+          reject(error);
+        }
+        resolve();
+      });
+    });
   }
 }
