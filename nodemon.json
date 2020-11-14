@@ -1,7 +1,7 @@
 {
   "watch": ["src"],
   "ext": "ts",
-  "ignore": ["src/**/*.spec.ts"],
+  "ignore": ["src/**/*.spec.ts", "src/routes.ts"],
   "exec": "node --inspect=127.0.0.1:9223 -r ts-node/register -- src/index.ts",
   "env": {}
 }
