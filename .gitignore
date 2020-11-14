@@ -5,3 +5,7 @@ build/
 tmp/
 temp/
 .env
+
+# Ignore generated files
+src/routes.ts
+src/swagger.json
