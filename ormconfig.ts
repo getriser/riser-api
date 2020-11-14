@@ -1,3 +1,5 @@
+import dbConfig from './src/config/db';
+
 const defaultConnectionOptions = {
   entities: ['src/entity/**/*.ts'],
   migrations: ['src/migration/**/*.ts'],
@@ -13,24 +15,11 @@ module.exports = [
   {
     name: 'default',
     type: 'postgres',
-    host: 'localhost',
-    port: 5433,
-    username: 'test',
-    password: 'test',
-    database: 'riser-api-development',
-    synchronize: true,
-    dropSchema: true,
-    logging: false,
-    ...defaultConnectionOptions,
-  },
-  {
-    name: 'test',
-    type: 'postgres',
-    host: 'localhost',
-    port: 5433,
-    username: 'test',
-    password: 'test',
-    database: 'riser-api-test',
+    host: dbConfig.hostname,
+    port: dbConfig.port,
+    username: dbConfig.username,
+    password: dbConfig.password,
+    database: dbConfig.dbname,
     synchronize: true,
     dropSchema: true,
     logging: false,
