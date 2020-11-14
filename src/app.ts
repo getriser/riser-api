@@ -2,7 +2,7 @@
 import * as express from 'express';
 import { serve, generateHTML } from 'swagger-ui-express';
 import * as bodyParser from 'body-parser';
-import { RegisterRoutes } from '../build/routes';
+import { RegisterRoutes } from './routes';
 import { ValidateError } from 'tsoa';
 import ApiError from './errors/ApiError';
 
@@ -22,7 +22,7 @@ app.use(
   '/docs',
   serve,
   async (_req: express.Request, res: express.Response) => {
-    return res.send(generateHTML(await import('../build/swagger.json')));
+    return res.send(generateHTML(await import('./swagger.json')));
   }
 );
 

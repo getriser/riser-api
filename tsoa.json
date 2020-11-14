@@ -10,11 +10,11 @@
         "in": "header"
       }
     },
-    "outputDirectory": "build",
+    "outputDirectory": "src",
     "specVersion": 3
   },
   "routes": {
-    "routesDir": "build",
+    "routesDir": "src",
     "authenticationModule": "./src/authentication.ts"
   }
 }
