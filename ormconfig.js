@@ -1,5 +1,3 @@
-import dbConfig from './src/config/db';
-
 const defaultConnectionOptions = {
   entities: ['src/entity/**/*.ts'],
   migrations: ['src/migration/**/*.ts'],
@@ -15,11 +13,11 @@ module.exports = [
   {
     name: 'default',
     type: 'postgres',
-    host: dbConfig.hostname,
-    port: dbConfig.port,
-    username: dbConfig.username,
-    password: dbConfig.password,
-    database: dbConfig.dbname,
+    host: process.env.EXPRESS_APP_DB_HOSTNAME,
+    port: process.env.EXPRESS_APP_DB_PORT,
+    username: process.env.EXPRESS_APP_DB_USERNAME,
+    password: process.env.EXPRESS_APP_DB_PASSSWORD,
+    database: process.env.EXPRESS_APP_DB_NAME,
     synchronize: true,
     dropSchema: true,
     logging: false,
