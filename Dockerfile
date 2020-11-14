@@ -6,11 +6,13 @@ WORKDIR /usr/src/app
 COPY package.json .
 COPY yarn.lock .
 
-RUN yarn --production
+RUN yarn
 
 COPY . .
 
 RUN yarn build
+
+RUN mv ormconfig.deploy.js ormconfig.js
 
 EXPOSE 3000
 
