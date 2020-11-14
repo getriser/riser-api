@@ -1,0 +1,27 @@
+version: '3'
+services:
+  postgres:
+    image: "postgres:9.6.1"
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: "test"
+      POSTGRES_PASSWORD: "test"
+      POSTGRES_DB: "riser-api-development"
+  web:
+    image: getriser/riser-api
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      EXPRESS_APP_DB_HOSTNAME: postgres
+      EXPRESS_APP_DB_PORT: 5432
+      EXPRESS_APP_DB_USERNAME: test
+      EXPRESS_APP_DB_PASSSWORD: test
+      EXPRESS_APP_DB_NAME: riser-api-development
+      EXPRESS_APP_JWT_SECRET: this-is-a-jwt-secret
+      EXPRESS_APP_ASSET_PATH: http://localhost:3000
+      EXPRESS_APP_AWS_ACCESS_KEY_ID:
+      EXPRESS_APP_AWS_SECRET_ACCESS_KEY:
+      EXPRESS_APP_FILES_S3_BUCKET_NAME:
+

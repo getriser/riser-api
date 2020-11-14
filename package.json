@@ -55,8 +55,8 @@
     "winston": "^3.3.3"
   },
   "scripts": {
-    "build": "tsoa spec-and-routes",
-    "start": "node build/src/server.js",
+    "build": "tsoa spec-and-routes && tsc",
+    "start": "node build/src/index.js",
     "dev": "concurrently \"nodemon\" \"nodemon -x tsoa spec-and-routes\"",
     "test": "jest",
     "test:watch": "jest --watch"
