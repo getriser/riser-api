@@ -11,7 +11,31 @@
       }
     },
     "outputDirectory": "src",
-    "specVersion": 3
+    "specVersion": 3,
+    "specMerging": "deepmerge",
+    "spec": {
+      "paths": {
+        "/folders/{id}/files": {
+          "post": {
+            "requestBody": {
+              "content": {
+                "multipart/form-data": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "file": {
+                        "type": "string",
+                        "format": "binary"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   },
   "routes": {
     "routesDir": "src",
