@@ -1,5 +1,10 @@
 import AbstractService from './AbstractService';
-import { CreateFolderParams, FileFolderType, FileResponse } from '../types';
+import {
+  CreateFolderParams,
+  FileFolderType,
+  FileResponse,
+  UpdateFileFolderRequest,
+} from '../types';
 import { getRepository } from 'typeorm';
 import FileFolder from '../entity/FileFolder';
 import ResourceNotFoundError from '../errors/ResourceNotFoundError';
@@ -9,6 +14,7 @@ import { User } from '../entity/User';
 import { v4 as uuidv4 } from 'uuid';
 import S3Manager from '../managers/S3Manager';
 import config from '../config/config';
+import ForbiddenApiError from '../errors/ForbiddenApiError';
 
 export default class FileService extends AbstractService {
   static async getFilesFromFolder(
@@ -116,6 +122,34 @@ export default class FileService extends AbstractService {
     folder.name = 'Root Folder';
 
     return filesRepository.save(folder);
+  }
+
+  static async updateFileFolder(
+    loggedInUserId: number,
+    fileFolderId: number,
+    updateFileFolderRequest: UpdateFileFolderRequest
+  ): Promise<FileResponse> {
+    const user = await this.findUserOrThrow(loggedInUserId);
+
+    const filesRepository = getRepository<FileFolder>(FileFolder);
+    let fileFolder = await filesRepository.findOne(fileFolderId);
+
+    if (!fileFolder) {
+      throw new ResourceNotFoundError('File / Folder not found.');
+    }
+
+    const fileOwner = await fileFolder.owner;
+    if (user.id != fileOwner.id) {
+      throw new ForbiddenApiError(
+        `You do not have permission to edit that ${fileFolder.type.toLowerCase()}`
+      );
+    }
+
+    fileFolder.name = updateFileFolderRequest.name;
+
+    fileFolder = await filesRepository.save(fileFolder);
+
+    return this.toFileResponse(fileFolder);
   }
 
   static async uploadFile(

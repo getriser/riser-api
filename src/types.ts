@@ -105,3 +105,7 @@ export interface FileResponse {
 export interface CreateFolderParams {
   name: string;
 }
+
+export interface UpdateFileFolderRequest {
+  name: string;
+}

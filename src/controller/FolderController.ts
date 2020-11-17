@@ -8,8 +8,13 @@ import {
   Get,
   Path,
   Tags,
+  Put,
 } from 'tsoa';
-import { CreateFolderParams, FileResponse } from '../types';
+import {
+  CreateFolderParams,
+  FileResponse,
+  UpdateFileFolderRequest,
+} from '../types';
 import * as express from 'express';
 import FileService from '../services/FileService';
 import * as multer from 'multer';
@@ -28,6 +33,16 @@ export class FolderController extends Controller {
     @Request() request: express.Request
   ): Promise<FileResponse> {
     return FileService.createFolder(request.user.userId, body.parentId, body);
+  }
+
+  @Put('/:id')
+  @Security('jwt')
+  public async updateFolder(
+    @Path() id: number,
+    @Body() body: UpdateFileFolderRequest,
+    @Request() request: express.Request
+  ): Promise<FileResponse> {
+    return FileService.updateFileFolder(request.user.userId, id, body);
   }
 
   @Get('/:id/files')
