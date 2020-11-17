@@ -9,6 +9,6 @@
     "experimentalDecorators": true,
     "sourceMap": true,
     "resolveJsonModule": true,
-    "types": ["reflect-metadata", "jest"]
+    "types": ["reflect-metadata", "jest", "multer"]
   }
 }

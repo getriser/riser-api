@@ -204,6 +204,7 @@ export default class FileService extends AbstractService {
       id: file.id,
       name: file.name,
       type: file.type,
+      parentFolderId: file.parentId,
       fileUrl,
     };
   }
