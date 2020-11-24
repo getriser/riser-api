@@ -1,6 +1,7 @@
 import AbstractService from './AbstractService';
 import {
   CreateFolderParams,
+  DownloadFileResponse,
   FileFolderType,
   FileResponse,
   UpdateFileFolderRequest,
@@ -157,6 +158,8 @@ export default class FileService extends AbstractService {
     parentFolderId: number,
     file: Express.Multer.File
   ): Promise<FileResponse> {
+    console.log('Upload File called...');
+
     const user = await this.findUserOrThrow(loggedInUserId);
 
     const filesRepository = getRepository<FileFolder>(FileFolder);
@@ -179,7 +182,11 @@ export default class FileService extends AbstractService {
 
     const filePath = `files/${uuidv4()}-${file.originalname}`;
 
+    console.log('Uploading to S3...');
+
     await S3Manager.upload(config.filesS3BucketName, filePath, file.buffer);
+
+    console.log('Uploaded.');
 
     const fileFolder = new FileFolder();
     fileFolder.name = file.originalname;
@@ -190,22 +197,50 @@ export default class FileService extends AbstractService {
     fileFolder.type = FileFolderType.FILE;
     fileFolder.fileSize = file.size;
 
+    console.log('Saving file.');
+
     const savedFile = await filesRepository.save(fileFolder);
 
     return this.toFileResponse(savedFile);
   }
 
-  private static toFileResponse(file: FileFolder): FileResponse {
-    const fileUrl = file.filePath
-      ? `${config.assetPath}/${file.filePath}`
-      : undefined;
+  static async downloadFile(
+    loggedInUserId: number,
+    fileFolderId: number
+  ): Promise<DownloadFileResponse> {
+    const user = await this.findUserOrThrow(loggedInUserId);
 
+    const filesRepository = getRepository<FileFolder>(FileFolder);
+    const fileFolder = await filesRepository.findOne(fileFolderId, {
+      relations: ['organization'],
+    });
+
+    if (!fileFolder || fileFolder.type !== FileFolderType.FILE) {
+      throw new ResourceNotFoundError('File not found.');
+    }
+
+    await this.throwIfNotBelongsToOrganization(
+      user,
+      await fileFolder.organization
+    );
+
+    const downloadUrl = await S3Manager.getSignedFileUrl(
+      config.filesS3BucketName,
+      fileFolder.filePath
+    );
+
+    return {
+      ...this.toFileResponse(fileFolder),
+      downloadUrl,
+    };
+  }
+
+  private static toFileResponse(file: FileFolder): FileResponse {
     return {
       id: file.id,
       name: file.name,
       type: file.type,
       parentFolderId: file.parentId,
-      fileUrl,
     };
   }
 }

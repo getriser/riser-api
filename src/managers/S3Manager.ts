@@ -39,4 +39,18 @@ export default class S3Manager {
       });
     });
   }
+
+  public static async getSignedFileUrl(
+    bucket: string,
+    key: string,
+    expiresInSeconds = 60 * 60
+  ): Promise<string> {
+    const params = {
+      Bucket: bucket,
+      Key: key,
+      Expires: expiresInSeconds,
+    };
+
+    return s3.getSignedUrlPromise('getObject', params);
+  }
 }

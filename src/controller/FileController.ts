@@ -7,8 +7,13 @@ import {
   Path,
   Tags,
   Put,
+  Get,
 } from 'tsoa';
-import { FileResponse, UpdateFileFolderRequest } from '../types';
+import {
+  DownloadFileResponse,
+  FileResponse,
+  UpdateFileFolderRequest,
+} from '../types';
 import * as express from 'express';
 import FileService from '../services/FileService';
 
@@ -23,5 +28,14 @@ export class FileController extends Controller {
     @Request() request: express.Request
   ): Promise<FileResponse> {
     return FileService.updateFileFolder(request.user.userId, id, body);
+  }
+
+  @Get('/:id/download')
+  @Security('jwt')
+  public async downloadFile(
+    @Path() id: number,
+    @Request() request: express.Request
+  ): Promise<DownloadFileResponse> {
+    return FileService.downloadFile(request.user.userId, id);
   }
 }

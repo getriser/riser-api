@@ -100,7 +100,6 @@ export interface FileResponse {
   name: string;
   type: FileFolderType;
   parentFolderId: number;
-  fileUrl?: string;
 }
 
 export interface CreateFolderParams {
@@ -109,4 +108,8 @@ export interface CreateFolderParams {
 
 export interface UpdateFileFolderRequest {
   name: string;
+}
+
+export interface DownloadFileResponse extends FileResponse {
+  downloadUrl: string;
 }
