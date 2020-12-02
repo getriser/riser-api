@@ -1,4 +1,3 @@
-import DomainObject from './DomainObject';
 import {
   Column,
   Entity,
@@ -10,9 +9,10 @@ import {
 import { User } from './User';
 import Organization from './Organization';
 import { FileFolderType } from '../types';
+import SoftDeletableDomainObject from './SoftDeletableDomainObject';
 
 @Entity()
-export default class FileFolder extends DomainObject {
+export default class FileFolder extends SoftDeletableDomainObject {
   @Column({ nullable: false })
   type: FileFolderType;
 

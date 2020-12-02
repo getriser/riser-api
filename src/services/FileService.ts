@@ -4,6 +4,8 @@ import {
   DownloadFileResponse,
   FileFolderType,
   FileResponse,
+  OrganizationUserRole,
+  SuccessMessage,
   UpdateFileFolderRequest,
 } from '../types';
 import { getRepository } from 'typeorm';
@@ -232,6 +234,39 @@ export default class FileService extends AbstractService {
     return {
       ...this.toFileResponse(fileFolder),
       downloadUrl,
+    };
+  }
+
+  public static async deleteFile(
+    loggedInUserId: number,
+    fileId: number
+  ): Promise<SuccessMessage> {
+    const user = await this.findUserOrThrow(loggedInUserId);
+
+    const filesRepository = getRepository<FileFolder>(FileFolder);
+    const fileFolder = await filesRepository.findOne(fileId, {
+      relations: ['organization'],
+    });
+
+    if (!fileFolder || fileFolder.type !== FileFolderType.FILE) {
+      throw new ResourceNotFoundError('File not found.');
+    }
+
+    await this.throwIfNotBelongsToOrganization(
+      user,
+      await fileFolder.organization
+    );
+
+    await this.throwIfNotRequiredRole(
+      user,
+      await fileFolder.organization,
+      OrganizationUserRole.OWNER
+    );
+
+    await filesRepository.softRemove(fileFolder);
+
+    return {
+      message: 'File deleted.',
     };
   }
 
