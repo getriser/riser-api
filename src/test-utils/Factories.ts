@@ -39,3 +39,20 @@ export const createAnnouncement = async (
     params
   );
 };
+
+export const createMulterFile = (fileName: string): Express.Multer.File => {
+  const file: Express.Multer.File = {
+    buffer: undefined,
+    destination: '',
+    encoding: '',
+    fieldname: '',
+    filename: '',
+    mimetype: '',
+    originalname: fileName,
+    path: '',
+    size: 0,
+    stream: undefined,
+  };
+
+  return file;
+};

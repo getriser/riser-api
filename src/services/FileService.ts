@@ -4,6 +4,8 @@ import {
   DownloadFileResponse,
   FileFolderType,
   FileResponse,
+  OrganizationUserRole,
+  SuccessMessage,
   UpdateFileFolderRequest,
 } from '../types';
 import { getRepository } from 'typeorm';
@@ -16,6 +18,7 @@ import { v4 as uuidv4 } from 'uuid';
 import S3Manager from '../managers/S3Manager';
 import config from '../config/config';
 import ForbiddenApiError from '../errors/ForbiddenApiError';
+import { Repository } from 'typeorm/repository/Repository';
 
 export default class FileService extends AbstractService {
   static async getFilesFromFolder(
@@ -25,9 +28,17 @@ export default class FileService extends AbstractService {
     const user = await this.findUserOrThrow(loggedInUserId);
 
     const filesRepository = getRepository<FileFolder>(FileFolder);
-    const folder = await filesRepository.findOne(folderId, {
-      relations: ['children'],
-    });
+
+    // This is how you have to reference a soft deleted relation.
+    const folder = await filesRepository
+      .createQueryBuilder('fileFolder')
+      .leftJoinAndSelect(
+        'fileFolder.children',
+        'child',
+        'child.deletedAt IS NULL'
+      )
+      .where('fileFolder.id = :id', { id: folderId })
+      .getOne();
 
     if (!folder) {
       throw new ResourceNotFoundError('Folder not found.');
@@ -233,6 +244,89 @@ export default class FileService extends AbstractService {
       ...this.toFileResponse(fileFolder),
       downloadUrl,
     };
+  }
+
+  public static async deleteFile(
+    loggedInUserId: number,
+    fileId: number
+  ): Promise<SuccessMessage> {
+    const user = await this.findUserOrThrow(loggedInUserId);
+
+    const filesRepository = getRepository<FileFolder>(FileFolder);
+    const fileFolder = await filesRepository.findOne(fileId, {
+      relations: ['organization'],
+    });
+
+    if (!fileFolder || fileFolder.type !== FileFolderType.FILE) {
+      throw new ResourceNotFoundError('File not found.');
+    }
+
+    await this.throwIfNotBelongsToOrganization(
+      user,
+      await fileFolder.organization
+    );
+
+    await this.throwIfNotRequiredRole(
+      user,
+      await fileFolder.organization,
+      OrganizationUserRole.OWNER
+    );
+
+    await filesRepository.softRemove(fileFolder);
+
+    return {
+      message: 'File deleted.',
+    };
+  }
+
+  public static async deleteFolder(
+    loggedInUserId: number,
+    folderId: number
+  ): Promise<SuccessMessage> {
+    const user = await this.findUserOrThrow(loggedInUserId);
+
+    const filesRepository = getRepository<FileFolder>(FileFolder);
+    const folder = await filesRepository.findOne(folderId, {
+      relations: ['organization'],
+    });
+
+    if (!folder || folder.type !== FileFolderType.FOLDER) {
+      throw new ResourceNotFoundError('Folder not found.');
+    }
+
+    await this.throwIfNotBelongsToOrganization(user, await folder.organization);
+
+    await this.throwIfNotRequiredRole(
+      user,
+      await folder.organization,
+      OrganizationUserRole.OWNER
+    );
+
+    await this.deleteFolderRecursive(filesRepository, user, folder);
+
+    return {
+      message: 'Folder deleted.',
+    };
+  }
+
+  private static async deleteFolderRecursive(
+    filesRepository: Repository<FileFolder>,
+    user: User,
+    folder: FileFolder
+  ): Promise<void> {
+    const children = await folder.children;
+
+    await Promise.all(
+      children
+        .filter((f) => f.type === FileFolderType.FOLDER)
+        .map((f) => this.deleteFolderRecursive(filesRepository, user, f))
+    );
+
+    await filesRepository.softRemove(
+      children.filter((f) => f.type === FileFolderType.FILE)
+    );
+
+    await filesRepository.softRemove(folder);
   }
 
   private static toFileResponse(file: FileFolder): FileResponse {

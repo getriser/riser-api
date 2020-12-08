@@ -3,6 +3,9 @@ import {
   ObjectCannedACL,
   PutObjectRequest,
   PutObjectOutput,
+  DeleteObjectsRequest,
+  Delete,
+  DeleteObjectsOutput,
 } from 'aws-sdk/clients/s3';
 import config from '../config/config';
 
@@ -31,6 +34,36 @@ export default class S3Manager {
 
     return new Promise((resolve, reject) => {
       s3.putObject(params, (err, data) => {
+        if (err) {
+          reject(err);
+        }
+
+        resolve(data);
+      });
+    });
+  }
+
+  public static async deleteKeys(
+    bucket: string,
+    keys: string[]
+  ): Promise<DeleteObjectsOutput> {
+    const objects = keys.map((key) => {
+      return {
+        Key: key,
+      };
+    });
+
+    const deleteObject: Delete = {
+      Objects: objects,
+    };
+
+    const params: DeleteObjectsRequest = {
+      Delete: deleteObject,
+      Bucket: bucket,
+    };
+
+    return new Promise((resolve, reject) => {
+      s3.deleteObjects(params, (err, data) => {
         if (err) {
           reject(err);
         }

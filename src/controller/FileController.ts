@@ -8,10 +8,12 @@ import {
   Tags,
   Put,
   Get,
+  Delete,
 } from 'tsoa';
 import {
   DownloadFileResponse,
   FileResponse,
+  SuccessMessage,
   UpdateFileFolderRequest,
 } from '../types';
 import * as express from 'express';
@@ -37,5 +39,14 @@ export class FileController extends Controller {
     @Request() request: express.Request
   ): Promise<DownloadFileResponse> {
     return FileService.downloadFile(request.user.userId, id);
+  }
+
+  @Delete('/:id')
+  @Security('jwt')
+  public async deleteFile(
+    @Path() id: number,
+    @Request() request: express.Request
+  ): Promise<SuccessMessage> {
+    return FileService.deleteFile(request.user.userId, id);
   }
 }

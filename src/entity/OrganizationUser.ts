@@ -1,5 +1,5 @@
 import DomainObject from './DomainObject';
-import { Column, Entity, Index, ManyToOne } from 'typeorm';
+import { Column, Entity, Index, ManyToOne, RelationId } from 'typeorm';
 import Organization from './Organization';
 import { OrganizationUserRole } from '../types';
 import { User } from './User';
@@ -14,6 +14,9 @@ export default class OrganizationUser extends DomainObject {
     (organization) => organization.organizationUsers
   )
   organization: Promise<Organization>;
+
+  @RelationId((orgUser: OrganizationUser) => orgUser.organization)
+  organizationId: number;
 
   @ManyToOne((type) => User, (user) => user.organizationUsers)
   user: Promise<User>;

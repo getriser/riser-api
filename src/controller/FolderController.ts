@@ -9,10 +9,12 @@ import {
   Path,
   Tags,
   Put,
+  Delete,
 } from 'tsoa';
 import {
   CreateFolderParams,
   FileResponse,
+  SuccessMessage,
   UpdateFileFolderRequest,
 } from '../types';
 import * as express from 'express';
@@ -43,6 +45,15 @@ export class FolderController extends Controller {
     @Request() request: express.Request
   ): Promise<FileResponse> {
     return FileService.updateFileFolder(request.user.userId, id, body);
+  }
+
+  @Delete('/:id')
+  @Security('jwt')
+  public async deleteFolder(
+    @Path() id: number,
+    @Request() request: express.Request
+  ): Promise<SuccessMessage> {
+    return FileService.deleteFolder(request.user.userId, id);
   }
 
   @Get('/:id/files')
