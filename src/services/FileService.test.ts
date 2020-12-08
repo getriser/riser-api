@@ -85,4 +85,45 @@ describe('FileService', () => {
       done();
     });
   });
+
+  describe('deleteFolder', () => {
+    it('deletes a folder recursively', async (done) => {
+      const user = await createUser();
+      const organization = await createOrganization(user);
+
+      const parentFolder = await FileService.getRootFolderForOrganization(
+        user.id,
+        organization.id
+      );
+
+      const folder1 = await FileService.createFolder(user.id, parentFolder.id, {
+        name: 'Folder 1',
+      });
+
+      const folder2 = await FileService.createFolder(user.id, folder1.id, {
+        name: 'Folder 1 > 2',
+      });
+
+      const file = createMulterFile('test-file.pdf');
+
+      await FileService.uploadFile(user.id, folder1.id, file);
+      await FileService.uploadFile(user.id, folder2.id, file);
+
+      let files = await FileService.getFilesFromFolder(user.id, folder1.id);
+
+      expect(files.length).toEqual(2);
+
+      files = await FileService.getFilesFromFolder(user.id, folder2.id);
+
+      expect(files.length).toEqual(1);
+
+      await FileService.deleteFolder(user.id, folder1.id);
+
+      files = await FileService.getFilesFromFolder(user.id, parentFolder.id);
+
+      expect(files.length).toEqual(0);
+
+      done();
+    });
+  });
 });
