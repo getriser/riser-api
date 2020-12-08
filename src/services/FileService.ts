@@ -27,9 +27,17 @@ export default class FileService extends AbstractService {
     const user = await this.findUserOrThrow(loggedInUserId);
 
     const filesRepository = getRepository<FileFolder>(FileFolder);
-    const folder = await filesRepository.findOne(folderId, {
-      relations: ['children'],
-    });
+
+    // This is how you have to reference a soft deleted relation.
+    const folder = await filesRepository
+      .createQueryBuilder('fileFolder')
+      .leftJoinAndSelect(
+        'fileFolder.children',
+        'child',
+        'child.deletedAt IS NULL'
+      )
+      .where('fileFolder.id = :id', { id: folderId })
+      .getOne();
 
     if (!folder) {
       throw new ResourceNotFoundError('Folder not found.');
