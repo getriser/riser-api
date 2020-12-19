@@ -9,3 +9,5 @@ temp/
 # Ignore generated files
 src/routes.ts
 src/swagger.json
+
+/copilot/riser-api/manifest.yml
