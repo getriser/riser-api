@@ -4,6 +4,7 @@ import Announcement from './Announcement';
 import OrganizationUser from './OrganizationUser';
 import config from '../config/config';
 import Comment from './Comment';
+import CalendarEvent from './CalendarEvent';
 
 @Entity()
 export class User extends DomainObject {
@@ -34,6 +35,9 @@ export class User extends DomainObject {
 
   @OneToMany(() => Announcement, (announcement) => announcement.author)
   announcements: Promise<Announcement[]>;
+
+  @OneToMany(() => CalendarEvent, (calendarEvent) => calendarEvent.user)
+  calendarEvents: Promise<CalendarEvent[]>;
 
   @OneToMany(
     () => OrganizationUser,

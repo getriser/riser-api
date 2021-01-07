@@ -113,3 +113,23 @@ export interface UpdateFileFolderRequest {
 export interface DownloadFileResponse extends FileResponse {
   downloadUrl: string;
 }
+
+export interface EventResponse {
+  title: string;
+  startDateUtc: Date;
+  endDateUtc: Date;
+  isAllDay: boolean;
+  duration: number;
+  isRecurring: boolean;
+  recurrencePattern: string;
+}
+
+export interface CreateEventParams {
+  title: string;
+  startDateUtc: Date;
+  endDateUtc: Date;
+  isAllDay: boolean;
+  duration: number;
+  isRecurring: boolean;
+  recurrencePattern: string;
+}
